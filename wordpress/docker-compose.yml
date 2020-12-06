@@ -1,0 +1,51 @@
+
+version: '3.3'
+
+services:
+   db:
+     image: mariadb:latest
+     volumes:
+       - ./db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: __set_passwd
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: __set_passwd
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:php7.4-fpm-alpine
+     volumes:
+       - ./html:/var/www/html
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wo
+       WORDPRESS_DB_PASSWORD: __set_passwd
+       WORDPRESS_DB_NAME: wordpress
+       WORDPRESS_TABLE_PREFIX: wp_
+   
+   nginx:
+     image: nginx:alpine
+     volumes:
+       - ./nginx:/etc/nginx/conf.d
+       - ./html:/var/www/html
+       - ./logs/nginx:/var/log/nginx
+       - ./certs/conf:/etc/nginx/ssl
+       - ./certs/www:/var/www/certbot
+     ports:
+       - 80:80
+       - 443:443
+     links:
+       - wordpress
+     restart: always
+   
+   certbot:
+     image: certbot/certbot
+     command: certonly --webroot --webroot-path=/var/www/certbot --email __your_email__ --agree-tos --no-eff-email -d __your_host
+     volumes:
+       - ./certs/conf:/etc/letsencrypt
+       - ./certs/www:/var/www/certbot
+       - ./logs/certbox:/var/log/letsencrypt
