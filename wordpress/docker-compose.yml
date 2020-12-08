@@ -12,25 +12,25 @@ services:
        MYSQL_USER: wordpress
        MYSQL_PASSWORD: __set_passwd
 
-   wordpress:
-     depends_on:
-       - db
-     image: wordpress:php7.4-apache
-     volumes:
-       - ./html:/var/www/html
-     restart: always
-     environment:
-       - WORDPRESS_DB_HOST: db:3306
-       - WORDPRESS_DB_USER: wo
-       - WORDPRESS_DB_PASSWORD: __set_passwd
-       - WORDPRESS_DB_NAME: wordpress
-       - WORDPRESS_TABLE_PREFIX: wp_
-       - VIRTUAL_HOST: demo.example.com
-       - LETSENCRYPT_HOST: demo.example.com
-       - LETSENCRYPT_EMAIL: example@mail.com
-     network:
-      - proxy-tier
-      - default
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:php7.4-apache
+    volumes:
+      - ./html:/var/www/html
+    restart: always
+    environment:
+      - WORDPRESS_DB_HOST: db:3306
+      - WORDPRESS_DB_USER: wordpress
+      - WORDPRESS_DB_PASSWORD: __set_passwd
+      - WORDPRESS_DB_NAME: wordpress
+      - WORDPRESS_TABLE_PREFIX: wp_
+      - VIRTUAL_HOST: demo.example.com
+      - LETSENCRYPT_HOST: demo.example.com
+      - LETSENCRYPT_EMAIL: example@mail.com
+    network:
+    - proxy-tier
+    - default
 
   proxy:
     image: jwilder/nginx-proxy
